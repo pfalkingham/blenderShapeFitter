@@ -103,6 +103,9 @@ class SHAPEFITTER_OT_calculate(bpy.types.Operator):
             verts1 = [obj.data.vertices[item.index].co.copy() for item in coll1]
             verts2 = [obj.data.vertices[item.index].co.copy() for item in coll2]
             fitCondyleCylinder.fit_condyle_cylinder(verts1, verts2, obj)
+            # Clear condyle vertex sets after calculation
+            coll1.clear()
+            coll2.clear()
         bpy.ops.object.mode_set(mode='EDIT')
         return {'FINISHED'}
 
