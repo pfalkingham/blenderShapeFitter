@@ -7,6 +7,9 @@ Fit primitive shapes to vertex selections in Blender.
 3. In the ShapeFitter panel (View3D > Sidebar > ShapeFitter), select the shape you want.
 4. Click **Calculate**.
 
+![Screenshot 2025-04-29 103737](https://github.com/user-attachments/assets/9fc1cd9c-9255-44e3-8a62-80f82d665d0f)
+
+
 ---
 
 ## Shape Instructions
