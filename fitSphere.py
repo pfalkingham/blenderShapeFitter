@@ -6,9 +6,10 @@ try:
 except ImportError:
     np = None
 
-def fit_sphere(verts, obj):
+def fit_sphere(verts, obj, operator=None):
     if len(verts) < 4:
-        bpy.ops.message.box('INVOKE_DEFAULT', message="Need at least 4 vertices to fit a sphere.")
+        if operator is not None:
+            operator.report({'WARNING'}, "Need at least 4 vertices to fit a sphere.")
         return
     # Convert verts to world coordinates
     world_verts = [obj.matrix_world @ v for v in verts]

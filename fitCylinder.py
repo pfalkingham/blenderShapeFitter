@@ -6,9 +6,10 @@ try:
 except ImportError:
     np = None
 
-def fit_cylinder(verts, obj):
+def fit_cylinder(verts, obj, operator=None):
     if len(verts) < 6:
-        bpy.ops.message.box('INVOKE_DEFAULT', message="Need at least 6 vertices to fit a cylinder.")
+        if operator is not None:
+            operator.report({'WARNING'}, "Need at least 6 vertices to fit a cylinder.")
         return
     # Convert verts to world coordinates
     world_verts = [obj.matrix_world @ v for v in verts]

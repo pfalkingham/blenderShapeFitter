@@ -3,35 +3,8 @@ import bpy
 class CondyleVertex(bpy.types.PropertyGroup):
     index: bpy.props.IntProperty()
 
-class SHAPEFITTER_PT_panel(bpy.types.Panel):
-    bl_label = "Shape Fitter"
-    bl_idname = "SHAPEFITTER_PT_panel"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = 'ShapeFitter'
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        layout.prop(scene, "shapefitter_shape", text="Shape")
-        if scene.shapefitter_shape == 'CONDYLE_CYLINDER':
-            box = layout.box()
-            box.label(text="Condyle 1 Vertices:")
-            row = box.row(align=True)
-            row.label(text=f"Count: {len(scene.condyle1_verts)}")
-            row.operator("shapefitter.add_condyle1", text="Add")
-            row.operator("shapefitter.clear_condyle1", text="Clear")
-            box.label(text="Condyle 2 Vertices:")
-            row = box.row(align=True)
-            row.label(text=f"Count: {len(scene.condyle2_verts)}")
-            row.operator("shapefitter.add_condyle2", text="Add")
-            row.operator("shapefitter.clear_condyle2", text="Clear")
-        layout.operator("shapefitter.calculate", text="Calculate")
-
-
-def register():
-    bpy.utils.register_class(CondyleVertex)
-    bpy.types.Scene.shapefitter_shape = bpy.props.EnumProperty(
+class ShapeFitterProperties(bpy.types.PropertyGroup):
+    shapefitter_shape: bpy.props.EnumProperty(
         name="Shape",
         description="Primitive to fit",
         items=[
@@ -42,14 +15,51 @@ def register():
         ],
         default='SPHERE'
     )
-    bpy.types.Scene.condyle1_verts = bpy.props.CollectionProperty(type=CondyleVertex)
-    bpy.types.Scene.condyle2_verts = bpy.props.CollectionProperty(type=CondyleVertex)
+    shapefitter_plane_subsample: bpy.props.BoolProperty(
+        name="Subsample for plane fitting",
+        description="Randomly subsample up to 10,000 vertices for plane fitting (faster for large selections)",
+        default=True
+    )
+    condyle1_verts: bpy.props.CollectionProperty(type=CondyleVertex)
+    condyle2_verts: bpy.props.CollectionProperty(type=CondyleVertex)
+
+class SHAPEFITTER_PT_panel(bpy.types.Panel):
+    bl_label = "Shape Fitter"
+    bl_idname = "SHAPEFITTER_PT_panel"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = 'ShapeFitter'
+
+    def draw(self, context):
+        layout = self.layout
+        props = context.scene.shapefitter_props
+        layout.prop(props, "shapefitter_shape", text="Shape")
+        if props.shapefitter_shape == 'PLANE':
+            layout.prop(props, "shapefitter_plane_subsample", text="Subsample for plane fitting (max 10,000)")
+        if props.shapefitter_shape == 'CONDYLE_CYLINDER':
+            box = layout.box()
+            box.label(text="Condyle 1 Vertices:")
+            row = box.row(align=True)
+            row.label(text=f"Count: {len(props.condyle1_verts)}")
+            row.operator("object.shapefitter_add_condyle1", text="Add")
+            row.operator("object.shapefitter_clear_condyle1", text="Clear")
+            box.label(text="Condyle 2 Vertices:")
+            row = box.row(align=True)
+            row.label(text=f"Count: {len(props.condyle2_verts)}")
+            row.operator("object.shapefitter_add_condyle2", text="Add")
+            row.operator("object.shapefitter_clear_condyle2", text="Clear")
+        layout.operator("object.shapefitter_calculate", text="Calculate")
+
+
+def register():
+    bpy.utils.register_class(CondyleVertex)
+    bpy.utils.register_class(ShapeFitterProperties)
+    bpy.types.Scene.shapefitter_props = bpy.props.PointerProperty(type=ShapeFitterProperties)
     bpy.utils.register_class(SHAPEFITTER_PT_panel)
 
 
 def unregister():
     bpy.utils.unregister_class(CondyleVertex)
-    del bpy.types.Scene.shapefitter_shape
-    del bpy.types.Scene.condyle1_verts
-    del bpy.types.Scene.condyle2_verts
+    bpy.utils.unregister_class(ShapeFitterProperties)
+    del bpy.types.Scene.shapefitter_props
     bpy.utils.unregister_class(SHAPEFITTER_PT_panel)

@@ -6,14 +6,15 @@ try:
 except ImportError:
     np = None
 
-def fit_condyle_cylinder(verts1, verts2, obj):
+def fit_condyle_cylinder(verts1, verts2, obj, operator=None):
     """
     Fit a cylinder using two sets of condyle vertices.
     verts1, verts2: lists of mathutils.Vector (local coordinates)
     obj: Blender object
     """
     if len(verts1) < 3 or len(verts2) < 3:
-        bpy.ops.message.box('INVOKE_DEFAULT', message="Need at least 3 vertices per condyle.")
+        if operator is not None:
+            operator.report({'WARNING'}, "Need at least 3 vertices per condyle.")
         return
     # Convert verts to world coordinates
     world_verts1 = [obj.matrix_world @ v for v in verts1]
@@ -50,7 +51,8 @@ def fit_condyle_cylinder(verts1, verts2, obj):
     axis = center2 - center1
     height = axis.length
     if height == 0:
-        bpy.ops.message.box('INVOKE_DEFAULT', message="Condyle centers are coincident.")
+        if operator is not None:
+            operator.report({'WARNING'}, "Condyle centers are coincident.")
         return
     axis_norm = axis.normalized()
     # Cylinder center: midpoint between centers
