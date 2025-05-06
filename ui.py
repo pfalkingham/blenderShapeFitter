@@ -49,6 +49,8 @@ class SHAPEFITTER_PT_panel(bpy.types.Panel):
             row.operator("object.shapefitter_add_condyle2", text="Add")
             row.operator("object.shapefitter_clear_condyle2", text="Clear")
         layout.operator("object.shapefitter_calculate", text="Calculate")
+        
+            
 
 
 def register():

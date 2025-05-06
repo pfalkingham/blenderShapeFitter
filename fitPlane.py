@@ -57,19 +57,28 @@ def fit_plane(verts, obj, subsample=True, operator=None):
         plane_size = max(size1, size2)
         # Add a small margin
         plane_size *= 1.05
+        bpy.ops.mesh.primitive_plane_add(size=plane_size, location=centroid)
+        plane = bpy.context.active_object
+        # Set orientation: local Z = normal, X = axis1, Y = axis2
+        rot_mat = mathutils.Matrix([
+            mathutils.Vector(axis1),
+            mathutils.Vector(axis2),
+            mathutils.Vector(plane_normal)
+        ]).transposed()
+        plane.matrix_world = rot_mat.to_4x4()
+        plane.location = centroid
     else:
         # fallback: use bounding box in local coordinates
         local_points = [v - centroid for v in world_verts]
         size1 = max(v.x for v in local_points) - min(v.x for v in local_points)
         size2 = max(v.y for v in local_points) - min(v.y for v in local_points)
         plane_size = max(size1, size2) * 1.05
-    bpy.ops.mesh.primitive_plane_add(size=plane_size, location=centroid)
-    plane = bpy.context.active_object
-    # Align plane normal
-    up = mathutils.Vector((0,0,1))
-    n = mathutils.Vector(normal)
-    if n.length > 0:
-        n.normalize()
-        rot = up.rotation_difference(n)
-        plane.rotation_euler = rot.to_euler()
-    # Optionally scale plane to fit points (not implemented)
+        bpy.ops.mesh.primitive_plane_add(size=plane_size, location=centroid)
+        plane = bpy.context.active_object
+        # Fallback: align Z to normal (if not default)
+        up = mathutils.Vector((0,0,1))
+        n = mathutils.Vector(normal)
+        if n.length > 0:
+            n.normalize()
+            rot = up.rotation_difference(n)
+            plane.rotation_euler = rot.to_euler()

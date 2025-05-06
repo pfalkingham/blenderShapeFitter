@@ -24,6 +24,10 @@ def fit_cylinder(verts, obj, operator=None):
         # Build orthonormal basis (axis, u, v)
         u = vh[1, :]
         v = vh[2, :]
+        # Ensure axis is Z, u is X, v is Y for Blender convention
+        z_axis = axis
+        x_axis = u
+        y_axis = v
         # Project points onto plane perpendicular to axis
         proj = np.dot(points - centroid, np.vstack([u, v]).T)
         x = proj[:, 0]
@@ -41,6 +45,17 @@ def fit_cylinder(verts, obj, operator=None):
         height = heights.max() - heights.min()
         # Place cylinder at center of span
         center3d_cyl = center3d + axis * (heights.max() + heights.min())/2
+        # Add cylinder at center3d_cyl, aligned to axis, with radius and height
+        bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=height, location=center3d_cyl)
+        cyl = bpy.context.active_object
+        # Set orientation: local Z = axis
+        rot_mat = mathutils.Matrix([
+            mathutils.Vector(x_axis),
+            mathutils.Vector(y_axis),
+            mathutils.Vector(z_axis)
+        ]).transposed()
+        cyl.matrix_world = rot_mat.to_4x4()
+        cyl.location = center3d_cyl
     else:
         # Fallback: use bounding box and centroid
         centroid = mathutils.Vector((0,0,0))
@@ -51,12 +66,12 @@ def fit_cylinder(verts, obj, operator=None):
         radius = sum((v - centroid).length for v in world_verts) / len(world_verts)
         height = max((v - centroid).dot(axis) for v in world_verts) - min((v - centroid).dot(axis) for v in world_verts)
         center3d_cyl = centroid
-    # Add cylinder at center3d_cyl, aligned to axis, with radius and height
-    bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=height, location=center3d_cyl)
-    cyl = bpy.context.active_object
-    up = mathutils.Vector((0,0,1))
-    n = mathutils.Vector(axis)
-    if n.length > 0:
-        n.normalize()
-        rot = up.rotation_difference(n)
-        cyl.rotation_euler = rot.to_euler()
+        # Add cylinder at center3d_cyl, aligned to axis, with radius and height
+        bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=height, location=center3d_cyl)
+        cyl = bpy.context.active_object
+        up = mathutils.Vector((0,0,1))
+        n = mathutils.Vector(axis)
+        if n.length > 0:
+            n.normalize()
+            rot = up.rotation_difference(n)
+            cyl.rotation_euler = rot.to_euler()
