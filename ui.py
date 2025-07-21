@@ -22,6 +22,15 @@ class ShapeFitterProperties(bpy.types.PropertyGroup):
     )
     condyle1_verts: bpy.props.CollectionProperty(type=CondyleVertex)
     condyle2_verts: bpy.props.CollectionProperty(type=CondyleVertex)
+    shapefitter_centering: bpy.props.EnumProperty(
+        name="Centering Method",
+        description="Method to center the shape",
+        items=[
+            ('AVERAGE', "Average", "Use average/centroid for location"),
+            ('MIDPOINT', "Midpoint", "Use midpoint of bounding box/height span for location")
+        ],
+        default='MIDPOINT'
+    )
 
 class SHAPEFITTER_PT_panel(bpy.types.Panel):
     bl_label = "Shape Fitter"
@@ -34,6 +43,9 @@ class SHAPEFITTER_PT_panel(bpy.types.Panel):
         layout = self.layout
         props = context.scene.shapefitter_props
         layout.prop(props, "shapefitter_shape", text="Shape")
+        # Show centering method for all relevant shapes
+        if props.shapefitter_shape in {'PLANE', 'CYLINDER', 'CONDYLE_CYLINDER'}:
+            layout.prop(props, "shapefitter_centering", text="Centering Method")
         if props.shapefitter_shape == 'PLANE':
             layout.prop(props, "shapefitter_plane_subsample", text="Subsample for plane fitting (max 10,000)")
         if props.shapefitter_shape == 'CONDYLE_CYLINDER':

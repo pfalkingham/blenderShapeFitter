@@ -6,7 +6,7 @@ try:
 except ImportError:
     np = None
 
-def fit_condyle_cylinder(verts1, verts2, obj, operator=None):
+def fit_condyle_cylinder(verts1, verts2, obj, operator=None, centering='AVERAGE'):
     """
     Fit a cylinder using two sets of condyle vertices.
     verts1, verts2: lists of mathutils.Vector (local coordinates)
@@ -49,17 +49,38 @@ def fit_condyle_cylinder(verts1, verts2, obj, operator=None):
         center2, radius2 = fit_sphere_fallback(world_verts2)
     # Cylinder axis: line from center1 to center2
     axis = center2 - center1
-    height = axis.length
-    if height == 0:
+    if axis.length == 0:
         if operator is not None:
             operator.report({'WARNING'}, "Condyle centers are coincident.")
         return
     axis_norm = axis.normalized()
-    # Cylinder center: midpoint between centers
-    cyl_center = (center1 + center2) / 2
-    # Cylinder radius: average of condyle radii
+    # Height: full span of all vertices projected onto axis
+    all_verts = world_verts1 + world_verts2
+    points = np.array([[v.x, v.y, v.z] for v in all_verts]) if np else None
+    if np:
+        base = center1
+        projections = np.dot(points - base, axis_norm)
+        min_proj = projections.min()
+        max_proj = projections.max()
+        height = max_proj - min_proj
+        if centering == 'MIDPOINT':
+            mid_proj = (min_proj + max_proj) / 2
+            cyl_center = base + axis_norm * mid_proj
+        else:
+            # Weighted average of condyle centers
+            cyl_center = (center1 * len(world_verts1) + center2 * len(world_verts2)) / (len(world_verts1) + len(world_verts2))
+    else:
+        base = center1
+        projections = [(v - base).dot(axis_norm) for v in all_verts]
+        min_proj = min(projections)
+        max_proj = max(projections)
+        height = max_proj - min_proj
+        if centering == 'MIDPOINT':
+            mid_proj = (min_proj + max_proj) / 2
+            cyl_center = base + axis_norm * mid_proj
+        else:
+            cyl_center = (center1 * len(world_verts1) + center2 * len(world_verts2)) / (len(world_verts1) + len(world_verts2))
     cyl_radius = (radius1 + radius2) / 2
-    # Add cylinder at cyl_center, aligned to axis, with radius and height
     bpy.ops.mesh.primitive_cylinder_add(radius=cyl_radius, depth=height, location=cyl_center)
     cyl = bpy.context.active_object
     up = mathutils.Vector((0,0,1))

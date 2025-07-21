@@ -77,6 +77,7 @@ class OBJECT_OT_shapefitter_calculate(bpy.types.Operator):
             return {'CANCELLED'}
         bpy.ops.object.mode_set(mode='OBJECT')
         shape = props.shapefitter_shape
+        centering = props.shapefitter_centering
         if shape == 'SPHERE':
             selected_verts = [v.co for v in obj.data.vertices if v.select]
             if not selected_verts:
@@ -91,14 +92,14 @@ class OBJECT_OT_shapefitter_calculate(bpy.types.Operator):
                 bpy.ops.object.mode_set(mode='EDIT')
                 return {'CANCELLED'}
             subsample = props.shapefitter_plane_subsample
-            fitPlane.fit_plane(selected_verts, obj, subsample=subsample, operator=self)
+            fitPlane.fit_plane(selected_verts, obj, subsample=subsample, operator=self, centering=centering)
         elif shape == 'CYLINDER':
             selected_verts = [v.co for v in obj.data.vertices if v.select]
             if not selected_verts:
                 self.report({'WARNING'}, "No vertices selected.")
                 bpy.ops.object.mode_set(mode='EDIT')
                 return {'CANCELLED'}
-            fitCylinder.fit_cylinder(selected_verts, obj, self)
+            fitCylinder.fit_cylinder(selected_verts, obj, self, centering=centering)
         elif shape == 'CONDYLE_CYLINDER':
             coll1 = props.condyle1_verts
             coll2 = props.condyle2_verts
@@ -108,7 +109,7 @@ class OBJECT_OT_shapefitter_calculate(bpy.types.Operator):
                 return {'CANCELLED'}
             verts1 = [obj.data.vertices[item.index].co.copy() for item in coll1]
             verts2 = [obj.data.vertices[item.index].co.copy() for item in coll2]
-            fitCondyleCylinder.fit_condyle_cylinder(verts1, verts2, obj, self)
+            fitCondyleCylinder.fit_condyle_cylinder(verts1, verts2, obj, self, centering=centering)
             # Clear condyle vertex sets after calculation
             coll1.clear()
             coll2.clear()

@@ -6,7 +6,7 @@ try:
 except ImportError:
     np = None
 
-def fit_cylinder(verts, obj, operator=None):
+def fit_cylinder(verts, obj, operator=None, centering='AVERAGE'):
     if len(verts) < 6:
         if operator is not None:
             operator.report({'WARNING'}, "Need at least 6 vertices to fit a cylinder.")
@@ -34,13 +34,15 @@ def fit_cylinder(verts, obj, operator=None):
         sol, *_ = np.linalg.lstsq(A, B, rcond=None)
         center2d = sol[:2]
         radius = np.sqrt(sol[2] + center2d.dot(center2d))
-        # 3D center of the circle (on the plane)
         center3d = centroid + center2d[0]*u + center2d[1]*v
-        # Height: span of points along axis
+        # Height: full span of points projected onto axis
         heights = np.dot(points - center3d, axis)
         height = heights.max() - heights.min()
-        # Place cylinder at center of span
-        center3d_cyl = center3d + axis * (heights.max() + heights.min())/2
+        if centering == 'MIDPOINT':
+            mid_height = (heights.max() + heights.min()) / 2
+            location = center3d + axis * mid_height
+        else:
+            location = centroid
     else:
         # Fallback: use bounding box and centroid
         centroid = mathutils.Vector((0,0,0))
@@ -48,11 +50,17 @@ def fit_cylinder(verts, obj, operator=None):
             centroid += v
         centroid /= len(world_verts)
         axis = mathutils.Vector((0,0,1))
+        # Project points onto axis
+        heights = [(v - centroid).dot(axis) for v in world_verts]
+        height = max(heights) - min(heights)
         radius = sum((v - centroid).length for v in world_verts) / len(world_verts)
-        height = max((v - centroid).dot(axis) for v in world_verts) - min((v - centroid).dot(axis) for v in world_verts)
-        center3d_cyl = centroid
+        if centering == 'MIDPOINT':
+            mid_height = (max(heights) + min(heights)) / 2
+            location = centroid + axis * mid_height
+        else:
+            location = centroid
     # Add cylinder at center3d_cyl, aligned to axis, with radius and height
-    bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=height, location=center3d_cyl)
+    bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=height, location=location)
     cyl = bpy.context.active_object
     up = mathutils.Vector((0,0,1))
     n = mathutils.Vector(axis)
