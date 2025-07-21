@@ -4,7 +4,7 @@ bl_info = {
     "version": (1, 2, 0),
     "blender": (4, 4, 0),
     "location": "View3D > Tool Shelf",
-    "description": "Fit primitives (sphere, plane, cylinder) to selected vertices.",
+    "description": "Fit primitives (sphere, plane, cylinder, box) to selected vertices.",
     "category": "Mesh",
 }
 

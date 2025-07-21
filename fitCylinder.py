@@ -24,6 +24,10 @@ def fit_cylinder(verts, obj, operator=None, centering='AVERAGE'):
         # Build orthonormal basis (axis, u, v)
         u = vh[1, :]
         v = vh[2, :]
+        # Ensure axis is Z, u is X, v is Y for Blender convention
+        z_axis = axis
+        x_axis = u
+        y_axis = v
         # Project points onto plane perpendicular to axis
         proj = np.dot(points - centroid, np.vstack([u, v]).T)
         x = proj[:, 0]

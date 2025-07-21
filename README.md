@@ -8,12 +8,14 @@ Fit primitive shapes to vertex selections in Blender.
 4. Choose the **Centering Method** (Average or Midpoint) for Sphere, Plane, Cylinder, and 2-condyle cylinder.
 5. Click **Calculate**.
 
----
+![Screenshot 2025-04-29 103737](https://github.com/user-attachments/assets/9fc1cd9c-9255-44e3-8a62-80f82d665d0f)
 
 ## Centering Method
 - **Average:** Uses the centroid (average position) of the selected vertices or regions.
 - **Midpoint:** Uses the midpoint of the bounding box or height span, projected onto the shape's axis or plane.
 
+
+All shapes have local axes oriented correctly.
 ---
 
 ## Shape Instructions
