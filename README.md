@@ -5,7 +5,8 @@ Fit primitive shapes to vertex selections in Blender.
 1. Enter Edit Mode on your mesh object.
 2. Select the vertices you want to use for fitting.
 3. In the ShapeFitter panel (View3D > Sidebar > ShapeFitter), select the shape you want.
-4. Choose the **Centering Method** (Average or Midpoint) for Sphere, Plane, Cylinder, and 2-condyle cylinder.
+4. Choose the **Centering Method** (Average or Midpoint) for Sphere, Plane, Cylinder, Ellipsoid, and 2-condyle cylinder.
+
 5. Click **Calculate**.
 
 ![Screenshot 2025-04-29 103737](https://github.com/user-attachments/assets/9fc1cd9c-9255-44e3-8a62-80f82d665d0f)
@@ -55,6 +56,16 @@ All shapes have local axes oriented correctly.
   6. Choose a centering method.
   7. Click **Calculate**. A cylinder will be fit using both condyle vertex sets, with height based on the full span of all vertices.
   8. Use **Clear** to reset either condyle set if needed.
+
+### 3 Ellipsoid
+- **Minimum vertices:** 9
+- **Steps:**
+  1. Enter Edit Mode and select at least 9 vertices.
+  2. Choose **Ellipsoid** from the Shape dropdown.
+  3. Choose a centering method.
+  4. Click **Calculate**. An ellipsoid will be fit to the selected vertices, matching the full spread (bounding box) of your selection along each principal axis.
+
+---
 
 ---
 

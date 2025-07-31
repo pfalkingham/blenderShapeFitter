@@ -1,5 +1,5 @@
 import bpy
-from . import fitSphere, fitPlane, fitCylinder, fitCondyleCylinder
+from . import fitSphere, fitPlane, fitCylinder, fitCondyleCylinder, fitEllipsoid
 
 class OBJECT_OT_shapefitter_add_condyle1(bpy.types.Operator):
     bl_idname = "object.shapefitter_add_condyle1"
@@ -100,6 +100,13 @@ class OBJECT_OT_shapefitter_calculate(bpy.types.Operator):
                 bpy.ops.object.mode_set(mode='EDIT')
                 return {'CANCELLED'}
             fitCylinder.fit_cylinder(selected_verts, obj, self, centering=centering)
+        elif shape == 'ELLIPSOID':
+            selected_verts = [v.co for v in obj.data.vertices if v.select]
+            if not selected_verts:
+                self.report({'WARNING'}, "No vertices selected.")
+                bpy.ops.object.mode_set(mode='EDIT')
+                return {'CANCELLED'}
+            fitEllipsoid.fit_ellipsoid(selected_verts, obj, self, centering=centering)
         elif shape == 'CONDYLE_CYLINDER':
             coll1 = props.condyle1_verts
             coll2 = props.condyle2_verts

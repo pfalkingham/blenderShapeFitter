@@ -12,6 +12,7 @@ class ShapeFitterProperties(bpy.types.PropertyGroup):
             ('PLANE', "Plane", "Fit a plane"),
             ('CYLINDER', "Cylinder", "Fit a cylinder"),
             ('CONDYLE_CYLINDER', "2 condyle cylinder", "Fit a cylinder using two condyle vertex sets"),
+            ('ELLIPSOID', "Ellipsoid", "Fit an ellipsoid"),
         ],
         default='SPHERE'
     )
@@ -44,7 +45,7 @@ class SHAPEFITTER_PT_panel(bpy.types.Panel):
         props = context.scene.shapefitter_props
         layout.prop(props, "shapefitter_shape", text="Shape")
         # Show centering method for all relevant shapes
-        if props.shapefitter_shape in {'PLANE', 'CYLINDER', 'CONDYLE_CYLINDER', 'ELLIPSE'}:
+        if props.shapefitter_shape in {'PLANE', 'CYLINDER', 'CONDYLE_CYLINDER', 'ELLIPSOID'}:
             layout.prop(props, "shapefitter_centering", text="Centering Method")
         if props.shapefitter_shape == 'PLANE':
             layout.prop(props, "shapefitter_plane_subsample", text="Subsample for plane fitting (max 10,000)")

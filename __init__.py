@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Blender Shape Fitter",
     "author": "Your Name",
-    "version": (1, 2, 0),
+    "version": (1, 3, 0),
     "blender": (4, 4, 0),
     "location": "View3D > Tool Shelf",
     "description": "Fit primitives (sphere, plane, cylinder, ellipse, box) to selected vertices.",
