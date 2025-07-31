@@ -113,13 +113,6 @@ class OBJECT_OT_shapefitter_calculate(bpy.types.Operator):
             # Clear condyle vertex sets after calculation
             coll1.clear()
             coll2.clear()
-        elif shape == 'BOX':
-            selected_verts = [v.co for v in obj.data.vertices if v.select]
-            if not selected_verts:
-                self.report({'WARNING'}, "No vertices selected.")
-                bpy.ops.object.mode_set(mode='EDIT')
-                return {'CANCELLED'}
-            fitCube.fit_cube(selected_verts, obj, self)
         bpy.ops.object.mode_set(mode='EDIT')
         return {'FINISHED'}
 
